@@ -8,12 +8,15 @@ specifiers:
   '@typescript-eslint/parser': ^5.57.1
   '@vitejs/plugin-react': ^3.1.0
   autoprefixer: ^10.4.14
+  buffer: ^6.0.3
   connectkit: ^1.2.2
   encoding: ^0.1.13
   eslint: ^8.37.0
   eslint-plugin-v3xlabs: ^1.6.0
   ethers: ^5
+  events: ^3.3.0
   postcss: ^8.4.21
+  process: ^0.11.10
   react: ^18.2.0
   react-dom: ^18.2.0
   styled-components: ^5.3.9
@@ -28,10 +31,13 @@ dependencies:
   '@ensdomains/thorin': 0.6.20_emdwivvopq42w3topovo6qazhe
   '@vitejs/plugin-react': 3.1.0_vite@4.2.1
   autoprefixer: 10.4.14_postcss@8.4.21
+  buffer: 6.0.3
   connectkit: 1.2.2_lgfesk3omklx7w5nll7ad3llhq
   encoding: 0.1.13
   ethers: 5.7.2
+  events: 3.3.0
   postcss: 8.4.21
+  process: 0.11.10
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   styled-components: 5.3.9_biqbaboplfbrettd7655fr4n2y
@@ -4787,6 +4793,11 @@ packages:
 
   /process-warning/1.0.0:
     resolution: {integrity: sha512-du4wfLyj4yCZq1VupnVSZmRsPJsNuxoDQFdCFHLaYiEbFBD7QE0a+I4D7hOxrVnh78QE/YipFAj9lXHiXocV+Q==}
+    dev: false
+
+  /process/0.11.10:
+    resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
+    engines: {node: '>= 0.6.0'}
     dev: false
 
   /proxy-compare/2.5.0:
