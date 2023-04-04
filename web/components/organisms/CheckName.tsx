@@ -16,23 +16,7 @@ export const CheckName: FC = () => {
             name: 'vitalik.eth',
         }
     });
-    const name = 'lucemansnl.twitter.ngo';
 
-    // const {data} = useContractRead(
-    //     {
-    //         abi: ENS_Resolver_ABI,
-    //         address: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
-    //         functionName: 'addr',
-    //         args: [
-    //             namehash(name),
-    //             // encodeFunctionData({
-    //             //   abi: text_resolver_abi,
-    //             //   functionName: 'text',
-    //             //   args: [namehash(name), key],
-    //             // }),
-    //         ],
-    //     }
-    // );
     const provider = useProvider();
 
     const [loading, setLoading] = useReducer((loading: number, action: 'incr' | 'decr') => {
