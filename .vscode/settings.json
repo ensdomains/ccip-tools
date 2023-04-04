@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/.gitignore": true,
+    "**/.next.config.js": true,
+    "**/pnpm-lock.yaml": true,
+  }
+}
