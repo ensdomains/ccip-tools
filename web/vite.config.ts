@@ -8,7 +8,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
     plugins: [tsconfigPaths(), react(), pluginRewriteAll()],
     define: {
-        global: 'globalThis',
+        // global: 'globalThis',
     },
 
     resolve: {
