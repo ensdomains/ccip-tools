@@ -13,7 +13,7 @@
     "author": "",
     "license": "GPL-3",
     "dependencies": {
-        "next": "^13.2.4",
+        "next": "13.2.5-canary.29",
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
     },
