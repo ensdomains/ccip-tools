@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, Input } from '@ensdomains/thorin';
 import { FC } from 'react';
 
