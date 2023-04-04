@@ -1,6 +1,5 @@
 {
     "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts", "**/*.svg"],
-    "exclude": ["node_modules"],
     "compilerOptions": {
         "esModuleInterop": true,
         "resolveJsonModule": true,
@@ -11,14 +10,6 @@
         "isolatedModules": true,
         "strict": true,
         "baseUrl": ".",
-        "lib": ["dom"],
-        "paths": {
-            "@components/*": ["src/components/*"],
-            "@assets/*": ["src/assets/*"],
-            "@utils/*": ["src/utils/*"],
-            "@pages/*": ["src/pages/*"],
-            "@hooks/*": ["src/hooks/*"],
-            "@styles/*": ["src/styles/*"]
-        }
+        "lib": ["dom"]
     }
 }
