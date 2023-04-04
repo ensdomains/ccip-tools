@@ -13,9 +13,15 @@
     "author": "",
     "license": "GPL-3",
     "dependencies": {
+        "connectkit": "^1.2.2",
+        "encoding": "^0.1.13",
+        "ethers": "^5",
+        "lokijs": "^1.5.12",
         "next": "13.2.5-canary.29",
+        "pino-pretty": "^10.0.0",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "wagmi": "^0.12.9"
     },
     "devDependencies": {
         "@types/node": "18.15.11",
