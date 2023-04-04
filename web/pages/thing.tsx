@@ -3,8 +3,9 @@ import { ConnectKitProvider, getDefaultClient } from 'connectkit';
 import { FC, ReactNode } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { createClient, WagmiConfig } from 'wagmi';
+import { goerli } from 'wagmi/chains';
 
-const client = createClient(getDefaultClient({ appName: 'CCIP Tools' }));
+const client = createClient(getDefaultClient({ appName: 'CCIP Tools', chains: [goerli] }));
 
 export const Thing: FC<{ children: ReactNode }> = ({ children }) => {
     return (

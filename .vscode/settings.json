@@ -1,7 +1,0 @@
-{
-  "files.exclude": {
-    "**/node_modules": true,
-    "**/.gitignore": true,
-    "**/pnpm-lock.yaml": true,
-  }
-}
