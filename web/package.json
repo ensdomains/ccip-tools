@@ -5,8 +5,8 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "next",
-        "build": "next build",
+        "dev": "vite",
+        "build": "vite build",
         "lint": "eslint -c .eslintrc.json --ext .ts ./src"
     },
     "keywords": [],
@@ -14,18 +14,19 @@
     "license": "GPL-3",
     "dependencies": {
         "@ensdomains/thorin": "^0.6.20",
+        "@vitejs/plugin-react": "^3.1.0",
         "autoprefixer": "^10.4.14",
         "connectkit": "^1.2.2",
         "encoding": "^0.1.13",
         "ethers": "^5",
-        "lokijs": "^1.5.12",
-        "next": "13.2.5-canary.29",
-        "pino-pretty": "^10.0.0",
         "postcss": "^8.4.21",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "styled-components": "^5.3.9",
         "tailwindcss": "^3.3.1",
+        "vite": "^4.2.1",
+        "vite-plugin-rewrite-all": "^1.0.1",
+        "vite-tsconfig-paths": "^4.0.8",
         "wagmi": "^0.12.9"
     },
     "devDependencies": {

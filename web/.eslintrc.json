@@ -4,16 +4,35 @@
         "ecmaVersion": 2021
     },
     "extends": [
-        "plugin:v3xlabs/recommended"
+        "plugin:v3xlabs/recommended",
+        "plugin:react/recommended",
+        "plugin:jsx-a11y/recommended"
     ],
-    "ignorePatterns": [
-        "!**/*"
-    ],
-    "plugins": [
-        "v3xlabs"
-    ],
+    "ignorePatterns": ["!**/*"],
+    "plugins": ["v3xlabs", "react", "node", "jsx-a11y"],
     "env": {
-        "node": true
+        "node": true,
+        "browser": true
     },
-    "rules": {}
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "globals": {
+        "JSX": "readonly"
+    },
+    "rules": {
+        "react/no-unescaped-entities": "off",
+        "react/react-in-jsx-scope": "off",
+        "node/no-process-env": "error",
+        "unicorn/no-nested-ternary": "off",
+        "unused-imports/no-unused-vars": "off",
+        "prettier/prettier": [
+            "error",
+            {
+                "singleQuote": true
+            }
+        ]
+    }
 }

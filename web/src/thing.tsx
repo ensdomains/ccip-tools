@@ -1,5 +1,3 @@
-'use client';
-
 import { lightTheme, ThorinGlobalStyles } from '@ensdomains/thorin';
 import { ConnectKitProvider, getDefaultClient } from 'connectkit';
 import { FC, ReactNode } from 'react';
