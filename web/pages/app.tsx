@@ -4,6 +4,7 @@ import { CheckName } from '../components/organisms/CheckName';
 import { Configuration } from '../components/organisms/Configuration';
 import { Thing } from './thing';
 import { BannerCard } from '../components/organisms/BannerCard';
+import { DeployResolverCard } from '../components/organisms/deploy/DeployResolver';
 
 export const App = () => {
     return (
@@ -20,8 +21,9 @@ export const App = () => {
                 </div>
                 <div className="flex flex-col gap-4 mt-4">
                     <BannerCard />
-                    <Configuration />
-                    <CheckName />
+                    <DeployResolverCard />
+                    {/* <Configuration /> */}
+                    {/* <CheckName /> */}
                 </div>
             </div>
         </Thing>
