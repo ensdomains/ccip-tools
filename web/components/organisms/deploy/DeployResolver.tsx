@@ -74,8 +74,9 @@ export const DeployResolverCard: FC = () => {
         <Card className="leading-6 gap-2">
             <div className="">
                 <h2 className="font-bold">Deploy an Offchain Resolver</h2>
-                <p className="text-neutral-700">
-                    In order to ensure you get these settings right, please read <a className="link">this page</a>.
+                <p className="text-neutral-700 mt-2">
+                    In order to use a gateway, you need to deploy a resolver to mainnet.
+                    We will help you deploy your <a className="link" href="https://github.com/ensdomains/ccip-tools/blob/master/contracts/OffchainResolver.sol">OffchainResolver</a>.
                 </p>
             </div>
 
@@ -112,7 +113,7 @@ export const DeployResolverCard: FC = () => {
             {
                 error && (
                     <p className="text-red-500">
-                        {JSON.stringify(error)}
+                        {chainId !== 5 ? 'Only Goerli is supported right now' : error.message}
                     </p>
                 )
             }
