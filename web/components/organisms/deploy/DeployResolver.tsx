@@ -1,8 +1,8 @@
-import { Button, Card, FlameSVG, GasPumpSVG, Input, WalletSVG } from "@ensdomains/thorin";
+import { Button, Card, FlameSVG, GasPumpSVG, Input, OutlinkSVG, WalletSVG } from "@ensdomains/thorin";
 import { useChains, useModal } from "connectkit";
 import { FactoryABI } from "../../../pages/abi/factory_abi";
 import { FC, useMemo, useState } from "react";
-import { Address, useAccount, useChainId, useConnect, useContractWrite, useFeeData, usePrepareContractWrite } from "wagmi";
+import { Address, useAccount, useChainId, useContractWrite, useFeeData, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther } from "viem";
 
 // https url that must include '{sender}'
@@ -53,7 +53,8 @@ export const DeployResolverCard: FC = () => {
         abi: FactoryABI,
         enabled: isReady,
     });
-    const { write, data } = useContractWrite(config as any);
+    const { write, data } = useContractWrite(config);
+    const receipt = useWaitForTransaction(data);
 
     const gas = useMemo(() => {
         if (!EstimateData) return null;
@@ -133,20 +134,21 @@ export const DeployResolverCard: FC = () => {
                 )
             }
             {
-                isConnected && (
-                    <Button disabled={!isReady || !write} onClick={() => {
-                        write?.();
-                    }}>
-                        {
-                            (() => {
-                                if (isLoading) return "Estimating Fees...";
-                                if (isSuccess) return "Deploy " + EstimateData?.request.gasLimit + " gas";
+                (() => {
+                    if (!isConnected) return null;
 
-                                return "Deploy";
-                            })()
-                        }
-                    </Button>
-                )
+                    if (receipt.isSuccess) return (
+                        <Button colorStyle="greenPrimary" suffix={<OutlinkSVG />} as="a" target="_blank" href={
+                            `https://${chainId === 5 ? "goerli." : ""}etherscan.io/tx/${receipt.data?.transactionHash}#internal`
+                        }>View on Etherscan</Button>
+                    );
+
+                    return (
+                        <Button disabled={!isReady || !write || receipt.isLoading} loading={receipt.isLoading} onClick={() => write?.()}>
+                            {receipt.isLoading ? "Processing" : isLoading ? 'Estimating Fees...' : isSuccess ? 'Deploy ' + EstimateData?.request.gasLimit + ' gas' : 'Deploy'}
+                        </Button>
+                    );
+                })()
             }
         </Card>
     )
