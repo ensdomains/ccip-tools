@@ -5,6 +5,7 @@ import { Configuration } from '../components/organisms/Configuration';
 import { Thing } from './thing';
 import { BannerCard } from '../components/organisms/BannerCard';
 import { DeployResolverCard } from '../components/organisms/deploy/DeployResolver';
+import { DeployedResolvers } from '../components/organisms/deployed_resolvers/DeployedResolvers';
 
 export const App = () => {
     return (
@@ -24,6 +25,7 @@ export const App = () => {
                     <DeployResolverCard />
                     {/* <Configuration /> */}
                     {/* <CheckName /> */}
+                    <DeployedResolvers />
                 </div>
             </div>
         </Thing>

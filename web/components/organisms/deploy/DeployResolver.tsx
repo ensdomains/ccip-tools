@@ -1,12 +1,14 @@
 import { Button, Card, FlameSVG, GasPumpSVG, Input, OutlinkSVG, WalletSVG } from "@ensdomains/thorin";
 import { useChains, useModal } from "connectkit";
 import { FactoryABI } from "../../../pages/abi/factory_abi";
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { Address, useAccount, useChainId, useContractWrite, useFeeData, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
 import { formatEther } from "viem";
+import { useDeployedResolvers } from "../../../stores/deployed_resolvers";
 
 // https url that must include '{sender}'
-const gatewayRegex = new RegExp("^https://.*{sender}.*$");
+// const gatewayRegex = new RegExp("^https://.*{sender}.*$");
+const gatewayRegex = new RegExp("^https://.*$");
 // address[] that must include 0x and are seperated by ,
 const signersRegex = new RegExp("^\\[0x[0-9a-fA-F]{40}(,0x[0-9a-fA-F]{40})*\\]$");
 
@@ -45,6 +47,8 @@ export const DeployResolverCard: FC = () => {
 
     const { data: FeeData } = useFeeData({ chainId, formatUnits: chainId == 5 ? 'kwei' : 'gwei' });
 
+    const { transactions, logTransaction, logTransactionSuccess } = useDeployedResolvers();
+
     const { config, data: EstimateData, error, isSuccess, isLoading } = usePrepareContractWrite({
         address: factoryAddress,
         chainId,
@@ -69,6 +73,27 @@ export const DeployResolverCard: FC = () => {
             gasTotal: formatEther(num.toBigInt() / goerliOffset, 'gwei').substring(0, 8),
         }
     }, [FeeData, EstimateData]);
+
+    console.log({ receipt: receipt?.data });
+
+    useEffect(() => {
+        if (!data) return;
+
+        logTransaction(data.hash, chainId.toString());
+    }, [data]);
+
+    useEffect(() => {
+        if (!receipt?.data) return;
+
+        const x = receipt.data;
+
+        const first = x.logs[0];
+        const address = first.address;
+
+        console.log('Contracted Deployed at: ' + address);
+
+        logTransactionSuccess(receipt.data.transactionHash, chainId.toString(), address);
+    }, [receipt?.data]);
 
     return (
         <Card className="leading-6 gap-2">
