@@ -19,6 +19,12 @@ const signersToArray = (signers: string) => {
     return n_signers;
 };
 
+const subdomainChainMap = {
+    1: '',
+    5: 'goerli.',
+    11155111: 'sepolia.'
+}
+
 const deployments: Record<number, {
     factory?: Address,
     resolver?: Address,
@@ -28,6 +34,9 @@ const deployments: Record<number, {
     },
     5: {
         factory: '0x2F180aDBAAb3c57af31B7E96969999D4FB33faEE',
+    },
+    11155111: {
+        factory: '0x0Fde82e81270431F2B956E7ce7E8860B2F61bcF9'
     }
 }
 
@@ -138,7 +147,7 @@ export const DeployResolverCard: FC = () => {
             {
                 error && (
                     <p className="text-red-500">
-                        {chainId !== 5 ? 'Only Goerli is supported right now' : error.message}
+                        {(chainId !== 5 || chainId !== 11155111) ? 'Only Goerli and Sepolia is supported right now' : error.message}
                     </p>
                 )
             }
@@ -165,7 +174,7 @@ export const DeployResolverCard: FC = () => {
 
                     if (receipt.isSuccess) return (
                         <Button colorStyle="greenPrimary" suffix={<OutlinkSVG />} as="a" target="_blank" href={
-                            `https://${chainId === 5 ? "goerli." : ""}etherscan.io/tx/${receipt.data?.transactionHash}#internal`
+                            `https://${subdomainChainMap[chainId] || ''}etherscan.io/tx/${receipt.data?.transactionHash}#internal`
                         }>View on Etherscan</Button>
                     );
 
