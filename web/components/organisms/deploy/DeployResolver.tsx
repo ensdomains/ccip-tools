@@ -147,7 +147,15 @@ export const DeployResolverCard: FC = () => {
             {
                 error && (
                     <p className="text-red-500">
-                        {(chainId !== 5 || chainId !== 11155111) ? 'Only Goerli and Sepolia is supported right now' : error.message}
+                        {!Object.keys(subdomainChainMap).includes(
+                            chainId.toString()
+                        )
+                            ? `This network is not supported, supported networks: [${Object.values(
+                                  subdomainChainMap
+                              )
+                                  .map((val) => (val === '' ? 'mainnet' : val))
+                                  .join(', ')}]`
+                            : error.message}
                     </p>
                 )
             }
