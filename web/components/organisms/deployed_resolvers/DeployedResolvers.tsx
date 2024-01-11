@@ -50,6 +50,10 @@ const explorer_urls: Record<number, {
         transaction: 'https://goerli.etherscan.io/tx/:hash',
         address: 'https://goerli.etherscan.io/address/:address'
     },
+    11155111: {
+        transaction: 'https://sepolia.etherscan.io/tx/:hash',
+        address: 'https://sepolia.etherscan.io/address/:address'
+    },
 };
 
 export const DeployedResolver: FC<{ transaction: TransactionStateDeployed }> = ({ transaction }) => {

@@ -45,8 +45,12 @@ library SignatureVerifier {
             response,
             (bytes, uint64, bytes)
         );
+        (bytes memory extraData, address sender) = abi.decode(
+            request,
+            (bytes, address)
+        );
         address signer = ECDSA.recover(
-            makeSignatureHash(address(this), expires, request, result),
+            makeSignatureHash(sender, expires, extraData, result),
             sig
         );
         require(

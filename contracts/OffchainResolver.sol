@@ -91,7 +91,7 @@ contract OffchainResolver is
             urls,
             callData,
             OffchainResolver.resolveWithProof.selector,
-            callData
+            abi.encode(callData, address(this))
         );
     }
 
