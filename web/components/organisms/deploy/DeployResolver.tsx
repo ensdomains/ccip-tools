@@ -30,7 +30,7 @@ const deployments: Record<number, {
     resolver?: Address,
 }> = {
     1: {
-        factory: '0xf9196c7fc786996eb5eb95118d828d505ef73bf9',
+        factory: '0x77020a1Cb2d4a0AE6CC773Cc726c1EfdEC0a50ab',
     },
     5: {
         factory: '0x2F180aDBAAb3c57af31B7E96969999D4FB33faEE',
