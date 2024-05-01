@@ -5,6 +5,7 @@ import { FC, useEffect, useMemo, useState } from "react";
 import { useAccount, useChainId, useSimulateContract, useWriteContract } from "wagmi";
 import { Address, formatEther } from "viem";
 import { useDeployedResolvers } from "../../../stores/deployed_resolvers";
+import { SORDeployments } from "../../../util/deployments";
 
 // https url that must include '{sender}'
 // const gatewayRegex = new RegExp("^https://.*{sender}.*$");
@@ -25,21 +26,6 @@ const subdomainChainMap = {
     11155111: 'sepolia.'
 }
 
-const deployments: Record<number, {
-    factory?: Address,
-    resolver?: Address,
-}> = {
-    1: {
-        factory: '0x77020a1Cb2d4a0AE6CC773Cc726c1EfdEC0a50ab',
-    },
-    5: {
-        factory: '0x2F180aDBAAb3c57af31B7E96969999D4FB33faEE',
-    },
-    11155111: {
-        factory: '0x0Fde82e81270431F2B956E7ce7E8860B2F61bcF9'
-    }
-}
-
 // Component that deploys the Simple Offchain Resolver\
 // This resolver signs its output with a public private key-pair.
 export const DeployResolverCard: FC = () => {
@@ -54,7 +40,7 @@ export const DeployResolverCard: FC = () => {
 
     const isReady = isGatewayUrlValid && isSignersValid;
 
-    const factoryAddress = deployments[chainId]?.factory;
+    const factoryAddress = SORDeployments[chainId]?.[0]?.factory;
 
     const { transactions, logTransaction, logTransactionSuccess } = useDeployedResolvers();
 

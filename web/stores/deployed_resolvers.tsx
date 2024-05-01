@@ -6,6 +6,7 @@ export type TransactionStatePending = {
     hash: string;
     chain: string;
 };
+
 export type TransactionStateDeployed = {
     status: 'deployed';
     hash: string;
