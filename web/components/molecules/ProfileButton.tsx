@@ -11,7 +11,7 @@ export const ProfileButton = () => {
     const { chains, switchChain } = useSwitchChain();
 
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 z-10">
             {
                 address &&
                 <>

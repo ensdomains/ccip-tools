@@ -13,7 +13,7 @@ const client = createConfig({
     chains: [goerli, mainnet, holesky, sepolia],
     transports: {
         [mainnet.id]: http(),
-        [goerli.id]: http(),
+        [goerli.id]: http('https://eth-goerli.public.blastapi.io'),
         [holesky.id]: http(),
         [sepolia.id]: http(),
     },
@@ -28,7 +28,7 @@ export const Thing: FC<{ children: ReactNode }> = ({ children }) => {
             <WagmiProvider config={client}>
                 <QueryClientProvider client={queryClient}>
                     <ConnectKitProvider>
-                        <div className="flex justify-end p-2 md:fixed right-0 top-0 w-full md:w-fit">
+                        <div className="flex justify-end p-2 md:absolute right-0 top-0 w-full md:w-fit">
                             <ProfileButton />
                         </div>
                         <div className="w-full max-w-xl mx-auto mt-2 md:mt-12 px-4 mb-24">

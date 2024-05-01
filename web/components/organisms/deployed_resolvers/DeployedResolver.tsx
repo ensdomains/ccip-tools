@@ -1,12 +1,15 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import { TransactionState, TransactionStateDeployed, TransactionStatePending, useDeployedResolvers } from "../../../stores/deployed_resolvers";
 import { useChainId, useReadContract, useTransaction } from "wagmi";
 import { Button, Card, Input } from "@ensdomains/thorin";
-import { FiExternalLink, FiFile, FiTrash, FiTrash2 } from 'react-icons/fi';
+import { FiChevronDown, FiChevronRight, FiChevronUp, FiExternalLink, FiFile, FiPenTool, FiTrash, FiTrash2 } from 'react-icons/fi';
 import { formatAddress } from '@ens-tools/format';
 import { explorer_urls } from "../../../util/deployments";
+import { cx } from "../../../util/cx";
 
 export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> = ({ transaction }) => {
+    const [collapsed, setCollapsed] = useState(true);
+
     const { data: gateway_data, error } = useReadContract({
         address: transaction.contract_address as any,
         abi: [{ name: 'url', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: 'url', type: 'string' }] }] as const,
@@ -23,8 +26,8 @@ export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> =
     const gateway_url = gateway_data as string;
 
     return (
-        <div className="p-4 border-t">
-            <div className="w-full flex justify-between items-center">
+        <div className="border-t pt-4">
+            <div className="w-full flex justify-between items-center px-4 pb-2">
                 <div>
                     <div className="flex gap-1 items-center">
                         {/* <FiFile /> */}
@@ -53,7 +56,7 @@ export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> =
                     Confirmed <FiExternalLink />
                 </a>
             </div>
-            <div className="mt-2 space-y-4 hidden">
+            <div className={cx("mt-2 space-y-4 px-4", collapsed && 'hidden')}>
                 <div className="text-sm">
                     <div className="font-bold">Gateway URL</div>
                     <div className="text-right">{gateway_data}</div>
@@ -74,17 +77,36 @@ export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> =
                         </span>
                     </div>
                 </div> */}
+                <div className="flex gap-2 items-center justify-between">
+                    <div>Set as Resolver</div>
+                    <button className="text-right flex items-center text-ens-blue hover:font-bold cursor-pointer" onClick={() => {
+                        console.log('hi');
+                    }}>
+                        Set as Resolver <FiChevronRight />
+                    </button>
+                </div>
+
                 <div className="flex gap-2">
-                    <Button onClick={() => { }} size="small">
+                    {/* <Button onClick={() => { }} size="small">
                         Set as Resolver
-                    </Button>
+                    </Button> */}
                     <div className="aspect-square">
-                        <Button onClick={() => { }} size="small" colorStyle="redSecondary">
+                        <Button onClick={() => { }} size="small" colorStyle="redSecondary" title="Delete Entry">
                             <FiTrash2 />
+                        </Button>
+                    </div>
+                    <div className="aspect-square">
+                        <Button onClick={() => { }} size="small" colorStyle="blueSecondary" title="Set URL">
+                            <FiPenTool />
                         </Button>
                     </div>
                 </div>
             </div>
+
+            <button onClick={() => setCollapsed(!collapsed)} className="text-ens-blue hover:font-bold cursor-pointer hover:bg-ens-blue/10 w-full flex justify-center items-center text-xs">
+                {collapsed ? 'Show Details' : 'Hide Details'}
+                {collapsed ? <FiChevronDown /> : <FiChevronUp />}
+            </button>
         </div>
     )
 };

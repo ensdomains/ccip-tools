@@ -16,7 +16,13 @@ export const PendingResolver: FC<{ transaction: TransactionStatePending }> = ({ 
     useEffect(() => {
         if (receipt) {
             console.log('Transaction Completed', receipt);
-            logTransactionSuccess(transaction.hash, transaction.chain, receipt.to as string);
+
+            const addressLog = receipt.logs.find((log) => log.topics[0] == '0x4500126d94fb0575f6f62aeaa53ad6d563ed80c940f50c37704c63456432543a');
+            // in the format `0x000000000000000000000000e7d827f15fc6ebc85fec6ff28f8817da62c2f158` instead of `0xe7d827f15fc6ebc85fec6ff28f8817da62c2f158`
+            const address = addressLog?.data;
+            const formattedAddress = address && `0x${address.slice(26)}`;
+
+            logTransactionSuccess(transaction.hash, transaction.chain, formattedAddress as string);
         }
     }, [receipt]);
 
