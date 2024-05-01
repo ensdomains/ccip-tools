@@ -4,11 +4,14 @@ import { useChainId, useReadContract, useTransaction } from "wagmi";
 import { Button, Card, Input } from "@ensdomains/thorin";
 import { FiChevronDown, FiChevronRight, FiChevronUp, FiExternalLink, FiFile, FiPenTool, FiTrash, FiTrash2 } from 'react-icons/fi';
 import { formatAddress } from '@ens-tools/format';
-import { explorer_urls } from "../../../util/deployments";
+import { chainIdToName, explorer_urls } from "../../../util/deployments";
 import { cx } from "../../../util/cx";
+import { SetUrlDialog } from "../set_url/SetUrlDialog";
+import { Address } from "viem";
 
 export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> = ({ transaction }) => {
     const [collapsed, setCollapsed] = useState(true);
+    const [urlDialogOpen, setUrlDialogOpen] = useState(false);
 
     const { data: gateway_data, error } = useReadContract({
         address: transaction.contract_address as any,
@@ -45,9 +48,7 @@ export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> =
                         <span>on</span>
                         <span className="text-ens-purple">
                             {
-                                transaction.chain == "1" ? "Mainnet" :
-                                    transaction.chain == "5" ? "Goerli" :
-                                        transaction.chain == "11155111" ? "Sepolia" : "Unknown"
+                                chainIdToName(Number.parseInt(transaction.chain))
                             }
                         </span>
                     </div>
@@ -96,7 +97,7 @@ export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> =
                         </Button>
                     </div>
                     <div className="aspect-square">
-                        <Button onClick={() => { }} size="small" colorStyle="blueSecondary" title="Set URL">
+                        <Button onClick={() => setUrlDialogOpen(true)} size="small" colorStyle="blueSecondary" title="Set URL">
                             <FiPenTool />
                         </Button>
                     </div>
@@ -107,6 +108,9 @@ export const DeployedSOResolver: FC<{ transaction: TransactionStateDeployed }> =
                 {collapsed ? 'Show Details' : 'Hide Details'}
                 {collapsed ? <FiChevronDown /> : <FiChevronUp />}
             </button>
+            {urlDialogOpen && (
+                <SetUrlDialog chain={Number.parseInt(transaction.chain)} resolver={transaction.contract_address as Address} current_value={gateway_url} onClose={() => { setUrlDialogOpen(false) }} />
+            )}
         </div>
     )
 };

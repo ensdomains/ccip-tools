@@ -54,6 +54,8 @@ export const DeployResolverCard: FC = () => {
 
     const { chains, switchChain } = useSwitchChain();
 
+    const {writeContract} = useWriteContract();
+
     // const { write, data } = useContractWrite(config);
     // const receipt = useWaitForTransaction(data);
 
@@ -105,7 +107,6 @@ export const DeployResolverCard: FC = () => {
 
             <Select
                 label={"ENS Deployment"}
-
                 value={chainId.toString()}
                 options={chains.map((chain) => ({
                     value: chain.id.toString(),
@@ -184,23 +185,31 @@ export const DeployResolverCard: FC = () => {
             <Banner alert="warning" title="Under Construction">
                 This section of the site is undergoing maintenance to support multiple versions & networks.
             </Banner>
-            {/* {
+            {
                 (() => {
                     if (!isConnected) return null;
 
-                    if (receipt.isSuccess) return (
-                        <Button colorStyle="greenPrimary" suffix={<OutlinkSVG />} as="a" target="_blank" href={
-                            `https://${subdomainChainMap[chainId] || ''}etherscan.io/tx/${receipt.data?.transactionHash}#internal`
-                        }>View on Etherscan</Button>
-                    );
+                    // if (receipt.isSuccess) return (
+                    //     <Button colorStyle="greenPrimary" suffix={<OutlinkSVG />} as="a" target="_blank" href={
+                    //         `https://${subdomainChainMap[chainId] || ''}etherscan.io/tx/${receipt.data?.transactionHash}#internal`
+                    //     }>View on Etherscan</Button>
+                    // );
 
                     return (
-                        <Button disabled={!isReady || !write || receipt.isLoading} loading={receipt.isLoading} onClick={() => write?.()}>
-                            {receipt.isLoading ? "Processing" : isLoading ? 'Estimating Fees...' : isSuccess ? 'Deploy ' + EstimateData?.request.gasLimit + ' gas' : 'Deploy'}
+                        <Button disabled={!isReady} onClick={() => {
+                            writeContract({
+                                abi: FactoryABI,
+                                address: factoryAddress,
+                                chainId,
+                                functionName: 'createOffchainResolver',
+                                args: [gatewayUrl, signersToArray(signers)],
+                            })
+                        }}>
+                            { isLoading ? 'Estimating Fees...' : isSuccess ? 'Deploy ' + EstimateData?.request.gas + ' gas' : 'Deploy'}
                         </Button>
                     );
                 })()
-            } */}
+            }
         </Card>
     )
 };

@@ -1,6 +1,12 @@
 import { Button, Profile, Select } from '@ensdomains/thorin';
 import { useModal } from 'connectkit';
-import { useAccount, useChainId, useEnsAvatar, useEnsName, useSwitchChain } from 'wagmi';
+import {
+    useAccount,
+    useChainId,
+    useEnsAvatar,
+    useEnsName,
+    useSwitchChain,
+} from 'wagmi';
 
 export const ProfileButton = () => {
     const { setOpen } = useModal();
@@ -12,8 +18,7 @@ export const ProfileButton = () => {
 
     return (
         <div className="flex items-center gap-1 z-10">
-            {
-                address &&
+            {address && (
                 <>
                     <Select
                         label={undefined}
@@ -30,17 +35,17 @@ export const ProfileButton = () => {
                         }}
                     />
                     <button onClick={() => setOpen(true)}>
-
-                        <Profile address={address || ''} ensName={name || ''} avatar={avatar || ''} />
+                        <Profile
+                            address={address || ''}
+                            ensName={name || ''}
+                            avatar={avatar || ''}
+                        />
                     </button>
                 </>
-            }
-            {
-                !address &&
-                <Button onClick={() => setOpen(true)}>
-                    Connect Wallet
-                </Button>
-            }
+            )}
+            {!address && (
+                <Button onClick={() => setOpen(true)}>Connect Wallet</Button>
+            )}
         </div>
     );
 };

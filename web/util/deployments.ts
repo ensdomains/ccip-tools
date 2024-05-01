@@ -52,3 +52,13 @@ export const explorer_urls: Record<
         address: 'https://sepolia.etherscan.io/address/:address',
     },
 };
+
+export const etherscanAddressURL = (chain: number, address: string) => {
+    return explorer_urls[chain].address.replace(':address', address);
+}
+
+export const chainIdToName = (chainId: number) => {
+    return chainId == 1 ? "Mainnet" :
+        chainId == 5 ? "Goerli" :
+            chainId == 11155111 ? "Sepolia" : "Unknown";
+}

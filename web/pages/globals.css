@@ -5,3 +5,18 @@
 .link {
     @apply font-bold text-blue-500 hover:underline cursor-pointer;
 }
+
+.modal {
+    z-index: 1999;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal > div {
+    opacity: 1;
+}
+
+#root {
+    z-index: 0;
+}

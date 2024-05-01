@@ -1,7 +1,6 @@
 import { lightTheme, ThorinGlobalStyles } from '@ensdomains/thorin';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConnectKitProvider } from 'connectkit';
-import { ConnectKitButton } from 'connectkit';
 import { FC, ReactNode } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { createConfig, http, WagmiProvider } from 'wagmi';

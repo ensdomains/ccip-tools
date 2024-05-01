@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { cx } from 'node:util/cx';
 import { FC } from 'react';
+
+import { cx } from '../../util/cx';
 
 export const ContractOrRegister: FC<{
     value: number;
@@ -13,7 +14,7 @@ export const ContractOrRegister: FC<{
                     className="bg-ens-blue h-full w-[49%] rounded-md absolute left-0"
                     animate={{ x: value === 0 ? 0 : '100%' }}
                 ></motion.div>
-                <div
+                <button
                     className={cx(
                         'z-10 w-full h-full flex items-center justify-center font-bold',
                         value == 0
@@ -25,8 +26,8 @@ export const ContractOrRegister: FC<{
                     }}
                 >
                     Contract
-                </div>
-                <div
+                </button>
+                <button
                     className={cx(
                         'z-10 w-full h-full flex items-center justify-center font-bold',
                         value == 1
@@ -38,7 +39,7 @@ export const ContractOrRegister: FC<{
                     }}
                 >
                     Gateway
-                </div>
+                </button>
             </div>
         </div>
     );
