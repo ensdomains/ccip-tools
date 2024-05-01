@@ -2,8 +2,8 @@ import { Button, Card, FlameSVG, GasPumpSVG, Input, OutlinkSVG, WalletSVG } from
 import { useChains, useModal } from "connectkit";
 import { FactoryABI } from "../../../pages/abi/factory_abi";
 import { FC, useEffect, useMemo, useState } from "react";
-import { Address, useAccount, useChainId, useContractWrite, useFeeData, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther } from "viem";
+import { useAccount, useChainId, useSimulateContract, useWriteContract } from "wagmi";
+import { Address, formatEther } from "viem";
 import { useDeployedResolvers } from "../../../stores/deployed_resolvers";
 
 // https url that must include '{sender}'
@@ -40,6 +40,8 @@ const deployments: Record<number, {
     }
 }
 
+// Component that deploys the Simple Offchain Resolver\
+// This resolver signs its output with a public private key-pair.
 export const DeployResolverCard: FC = () => {
     const { isConnected } = useAccount();
     const chainId = useChainId();
@@ -54,55 +56,54 @@ export const DeployResolverCard: FC = () => {
 
     const factoryAddress = deployments[chainId]?.factory;
 
-    const { data: FeeData } = useFeeData({ chainId, formatUnits: chainId == 5 ? 'kwei' : 'gwei' });
-
     const { transactions, logTransaction, logTransactionSuccess } = useDeployedResolvers();
 
-    const { config, data: EstimateData, error, isSuccess, isLoading } = usePrepareContractWrite({
+    const { data: EstimateData, error, isSuccess, isLoading } = useSimulateContract({
         address: factoryAddress,
         chainId,
         functionName: 'createOffchainResolver',
         args: [gatewayUrl, signersToArray(signers)],
         abi: FactoryABI,
-        enabled: isReady,
+        // enabled: isReady,
     });
-    const { write, data } = useContractWrite(config);
-    const receipt = useWaitForTransaction(data);
 
-    const gas = useMemo(() => {
-        if (!EstimateData) return null;
-        if (!FeeData) return null;
-        if (!FeeData.gasPrice) return null;
+    // const { write, data } = useContractWrite(config);
+    // const receipt = useWaitForTransaction(data);
 
-        const num = FeeData.gasPrice.mul(EstimateData.request.gasLimit);
-        const goerliOffset = chainId == 5 ? 1000n : 1n;
+    // const gas = useMemo(() => {
+    //     if (!EstimateData) return null;
+    //     if (!FeeData) return null;
+    //     if (!FeeData.gasPrice) return null;
 
-        return {
-            // Is it me or is goerli fee data off by /1000
-            gasTotal: formatEther(num.toBigInt() / goerliOffset, 'gwei').substring(0, 8),
-        }
-    }, [FeeData, EstimateData]);
+    //     const num = FeeData.gasPrice.mul(EstimateData.request.gasLimit);
+    //     const goerliOffset = chainId == 5 ? 1000n : 1n;
 
-    console.log({ receipt: receipt?.data });
+    //     return {
+    //         // Is it me or is goerli fee data off by /1000
+    //         gasTotal: formatEther(num.toBigInt() / goerliOffset, 'gwei').substring(0, 8),
+    //     }
+    // }, [FeeData, EstimateData]);
 
-    useEffect(() => {
-        if (!data) return;
+    // console.log({ receipt: receipt?.data });
 
-        logTransaction(data.hash, chainId.toString());
-    }, [data]);
+    // useEffect(() => {
+    //     if (!data) return;
 
-    useEffect(() => {
-        if (!receipt?.data) return;
+    //     logTransaction(data.hash, chainId.toString());
+    // }, [data]);
 
-        const x = receipt.data;
+    // useEffect(() => {
+    //     if (!receipt?.data) return;
 
-        const first = x.logs[0];
-        const address = first.address;
+    //     const x = receipt.data;
 
-        console.log('Contracted Deployed at: ' + address);
+    //     const first = x.logs[0];
+    //     const address = first.address;
 
-        logTransactionSuccess(receipt.data.transactionHash, chainId.toString(), address);
-    }, [receipt?.data]);
+    //     console.log('Contracted Deployed at: ' + address);
+
+    //     logTransactionSuccess(receipt.data.transactionHash, chainId.toString(), address);
+    // }, [receipt?.data]);
 
     return (
         <Card className="leading-6 gap-2">
@@ -164,19 +165,19 @@ export const DeployResolverCard: FC = () => {
                     <div className="flex justify-around items-center">
                         <div className="flex gap-2 items-center">
                             <GasPumpSVG />
-                            {FeeData?.formatted?.gasPrice}
+                            {EstimateData.request.gasPrice?.toString()}
                         </div>
                         <div className="flex gap-2 items-center">
                             <FlameSVG />
-                            {Number(EstimateData.request.gasLimit).toLocaleString()}
+                            {Number(EstimateData.request.gas).toLocaleString()}
                         </div>
                         <div className="flex gap-2 items-center">
-                            <WalletSVG /> {gas?.gasTotal}
+                            <WalletSVG />
                         </div>
                     </div>
                 )
             }
-            {
+            {/* {
                 (() => {
                     if (!isConnected) return null;
 
@@ -192,7 +193,7 @@ export const DeployResolverCard: FC = () => {
                         </Button>
                     );
                 })()
-            }
+            } */}
         </Card>
     )
 };

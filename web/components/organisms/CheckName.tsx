@@ -1,9 +1,7 @@
-import { Card, Input, Button } from '@ensdomains/thorin';
-import { namehash } from 'viem/ens';
-import { FC, useReducer, useState } from 'react';
+import { Button, Card, Input } from '@ensdomains/thorin';
+import { FC, useReducer } from 'react';
 import { useForm } from 'react-hook-form';
-import { ENS_Resolver_ABI } from '../../pages/abi/resolver_abi.js';
-import { useContractRead, useEnsName, useProvider } from 'wagmi';
+import { useProvider } from 'wagmi';
 
 type FormValues = {
     name: string;
@@ -14,14 +12,17 @@ export const CheckName: FC = () => {
         mode: 'onChange',
         defaultValues: {
             name: 'vitalik.eth',
-        }
+        },
     });
 
     const provider = useProvider();
 
-    const [loading, setLoading] = useReducer((loading: number, action: 'incr' | 'decr') => {
-        return action === 'incr' ? loading + 1 : loading - 1;
-    }, 0);
+    const [loading, setLoading] = useReducer(
+        (loading: number, action: 'incr' | 'decr') => {
+            return action === 'incr' ? loading + 1 : loading - 1;
+        },
+        0
+    );
 
     const onSubmit = handleSubmit(async ({ name }) => {
         setLoading('incr');
@@ -40,7 +41,11 @@ export const CheckName: FC = () => {
             <form onSubmit={onSubmit}>
                 <h2 className="font-bold">CheckName</h2>
                 <div className="flex flex-col gap-4 mt-2">
-                    <Input label="" placeholder="vitalik.eth" {...register('name')} />
+                    <Input
+                        label=""
+                        placeholder="vitalik.eth"
+                        {...register('name')}
+                    />
                     <Button type="submit" loading={loading > 0}>
                         Check
                     </Button>

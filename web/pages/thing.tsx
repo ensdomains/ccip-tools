@@ -1,28 +1,40 @@
 import { lightTheme, ThorinGlobalStyles } from '@ensdomains/thorin';
-import { ConnectKitProvider, getDefaultClient } from 'connectkit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConnectKitProvider } from 'connectkit';
+import { ConnectKitButton } from 'connectkit';
 import { FC, ReactNode } from 'react';
 import { ThemeProvider } from 'styled-components';
-import { createClient, WagmiConfig } from 'wagmi';
-import { mainnet, goerli, sepolia } from 'wagmi/chains';
+import { createConfig, http, WagmiProvider } from 'wagmi';
+import { goerli, holesky, mainnet, sepolia } from 'wagmi/chains';
 
-const client = createClient(
-    getDefaultClient({
-        appName: 'CCIP Tools',
-        chains: [sepolia, mainnet, goerli],
-    })
-);
+const client = createConfig({
+    chains: [goerli, mainnet, holesky, sepolia],
+    transports: {
+        [mainnet.id]: http(),
+        [goerli.id]: http(),
+        [holesky.id]: http(),
+        [sepolia.id]: http(),
+    },
+});
+
+const queryClient = new QueryClient();
 
 export const Thing: FC<{ children: ReactNode }> = ({ children }) => {
     return (
         <ThemeProvider theme={lightTheme}>
             <ThorinGlobalStyles />
-            <WagmiConfig client={client}>
-                <ConnectKitProvider>
-                    <div className="w-full max-w-lg mx-auto mt-12 px-4">
-                        {children}
-                    </div>
-                </ConnectKitProvider>
-            </WagmiConfig>
+            <WagmiProvider config={client}>
+                <QueryClientProvider client={queryClient}>
+                    <ConnectKitProvider>
+                        <div className="flex justify-end p-2 md:fixed right-0 top-0 w-full md:w-fit">
+                            <ConnectKitButton showAvatar theme='soft' />
+                        </div>
+                        <div className="w-full max-w-lg mx-auto mt-2 md:mt-12 px-4 mb-24">
+                            {children}
+                        </div>
+                    </ConnectKitProvider>
+                </QueryClientProvider>
+            </WagmiProvider>
         </ThemeProvider>
     );
 };
