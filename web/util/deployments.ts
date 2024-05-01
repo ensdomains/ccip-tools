@@ -1,11 +1,11 @@
-import { Address } from "viem";
-import { goerli, holesky, mainnet, sepolia } from "viem/chains";
+import { Address } from 'viem';
+import { goerli, holesky, mainnet, sepolia } from 'viem/chains';
 
 type SORVersion = '1' | '2';
 
 type SORDeployment = {
-    factory: Address,
-    version: SORVersion,
+    factory: Address;
+    version: SORVersion;
 };
 
 export const SORDeployments: Record<number, SORDeployment[]> = {
@@ -32,20 +32,23 @@ export const SORDeployments: Record<number, SORDeployment[]> = {
     ],
 };
 
-export const explorer_urls: Record<number, {
-    transaction: string,
-    address: string,
-}> = {
+export const explorer_urls: Record<
+    number,
+    {
+        transaction: string;
+        address: string;
+    }
+> = {
     1: {
         transaction: 'https://etherscan.io/tx/:hash',
-        address: 'https://etherscan.io/address/:address'
+        address: 'https://etherscan.io/address/:address',
     },
     5: {
         transaction: 'https://goerli.etherscan.io/tx/:hash',
-        address: 'https://goerli.etherscan.io/address/:address'
+        address: 'https://goerli.etherscan.io/address/:address',
     },
-    11155111: {
+    11_155_111: {
         transaction: 'https://sepolia.etherscan.io/tx/:hash',
-        address: 'https://sepolia.etherscan.io/address/:address'
+        address: 'https://sepolia.etherscan.io/address/:address',
     },
 };

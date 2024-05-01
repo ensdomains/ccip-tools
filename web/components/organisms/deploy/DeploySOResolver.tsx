@@ -1,8 +1,8 @@
-import { Button, Card, FlameSVG, GasPumpSVG, Input, OutlinkSVG, WalletSVG } from "@ensdomains/thorin";
+import { Banner, Button, Card, FieldSet, FlameSVG, GasPumpSVG, Input, OutlinkSVG, Select, WalletSVG } from "@ensdomains/thorin";
 import { useChains, useModal } from "connectkit";
 import { FactoryABI } from "../../../pages/abi/factory_abi";
 import { FC, useEffect, useMemo, useState } from "react";
-import { useAccount, useChainId, useSimulateContract, useWriteContract } from "wagmi";
+import { useAccount, useChainId, useSimulateContract, useSwitchChain, useWriteContract } from "wagmi";
 import { Address, formatEther } from "viem";
 import { useDeployedResolvers } from "../../../stores/deployed_resolvers";
 import { SORDeployments } from "../../../util/deployments";
@@ -44,14 +44,15 @@ export const DeployResolverCard: FC = () => {
 
     const { transactions, logTransaction, logTransactionSuccess } = useDeployedResolvers();
 
-    const { data: EstimateData, error, isSuccess, isLoading } = useSimulateContract({
+    const { data: EstimateData, error, isSuccess, isLoading } = useSimulateContract(isReady ? {
         address: factoryAddress,
         chainId,
         functionName: 'createOffchainResolver',
         args: [gatewayUrl, signersToArray(signers)],
         abi: FactoryABI,
-        // enabled: isReady,
-    });
+    } : undefined);
+
+    const { chains, switchChain } = useSwitchChain();
 
     // const { write, data } = useContractWrite(config);
     // const receipt = useWaitForTransaction(data);
@@ -101,6 +102,22 @@ export const DeployResolverCard: FC = () => {
                 </p>
             </div>
 
+
+            <Select
+                label={"ENS Deployment"}
+
+                value={chainId.toString()}
+                options={chains.map((chain) => ({
+                    value: chain.id.toString(),
+                    label: chain.name,
+                }))}
+                onChange={(event) => {
+                    switchChain({
+                        chainId: Number.parseInt(event.target.value),
+                    });
+                }}
+            />
+
             <Input
                 label="Gateway URL"
                 value={gatewayUrl}
@@ -138,10 +155,10 @@ export const DeployResolverCard: FC = () => {
                             chainId.toString()
                         )
                             ? `This network is not supported, supported networks: [${Object.values(
-                                  subdomainChainMap
-                              )
-                                  .map((val) => (val === '' ? 'mainnet' : val))
-                                  .join(', ')}]`
+                                subdomainChainMap
+                            )
+                                .map((val) => (val === '' ? 'mainnet' : val))
+                                .join(', ')}]`
                             : error.message}
                     </p>
                 )
@@ -163,6 +180,10 @@ export const DeployResolverCard: FC = () => {
                     </div>
                 )
             }
+
+            <Banner alert="warning" title="Under Construction">
+                This section of the site is undergoing maintenance to support multiple versions & networks.
+            </Banner>
             {/* {
                 (() => {
                     if (!isConnected) return null;

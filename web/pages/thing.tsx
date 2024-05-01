@@ -7,6 +7,8 @@ import { ThemeProvider } from 'styled-components';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import { goerli, holesky, mainnet, sepolia } from 'wagmi/chains';
 
+import { ProfileButton } from '../components/molecules/ProfileButton';
+
 const client = createConfig({
     chains: [goerli, mainnet, holesky, sepolia],
     transports: {
@@ -27,9 +29,9 @@ export const Thing: FC<{ children: ReactNode }> = ({ children }) => {
                 <QueryClientProvider client={queryClient}>
                     <ConnectKitProvider>
                         <div className="flex justify-end p-2 md:fixed right-0 top-0 w-full md:w-fit">
-                            <ConnectKitButton showAvatar theme='soft' />
+                            <ProfileButton />
                         </div>
-                        <div className="w-full max-w-lg mx-auto mt-2 md:mt-12 px-4 mb-24">
+                        <div className="w-full max-w-xl mx-auto mt-2 md:mt-12 px-4 mb-24">
                             {children}
                         </div>
                     </ConnectKitProvider>
