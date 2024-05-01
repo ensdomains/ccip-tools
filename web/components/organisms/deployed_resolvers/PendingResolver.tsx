@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react";
 import { FiExternalLink, FiLoader } from "react-icons/fi";
 import { TransactionStatePending, useDeployedResolvers } from "../../../stores/deployed_resolvers";
-import { explorer_urls } from "../../../util/deployments";
+import { chainIdToName, explorer_urls } from "../../../util/deployments";
 import { useWaitForTransactionReceipt } from "wagmi";
 
 export const PendingResolver: FC<{ transaction: TransactionStatePending }> = ({ transaction }) => {
@@ -40,7 +40,7 @@ export const PendingResolver: FC<{ transaction: TransactionStatePending }> = ({ 
                         </span>
                         <span>on</span>
                         <span>
-                            {transaction.chain}
+                            {chainIdToName(Number.parseInt(transaction.chain))}
                         </span>
                     </div>
                 </div>

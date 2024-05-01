@@ -8,6 +8,12 @@ type SORDeployment = {
     version: SORVersion;
 };
 
+export const isSOREnabled = (chainId: number) => {
+    if (chainId == 5) return 'deprecated';
+    if (SORDeployments.hasOwnProperty(chainId) && SORDeployments[chainId].length > 0) return 'available';
+    return 'unavailable';
+};
+
 export const SORDeployments: Record<number, SORDeployment[]> = {
     [mainnet.id]: [
         {

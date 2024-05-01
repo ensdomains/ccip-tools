@@ -22,7 +22,7 @@ export const DeployedResolvers = () => {
                 </div>
                 <div className="w-full">
                     {
-                        transactionForChain.map((transaction) => <TransactionHistoryEntry key={`mod-tx-${transaction.hash}`} transaction={transaction} />)
+                        transactionForChain.map((transaction) => <TransactionHistoryEntry key={`mod-tx-${transaction.hash}`} transaction={transaction} />).reverse()
                     }
                 </div>
             </Card>

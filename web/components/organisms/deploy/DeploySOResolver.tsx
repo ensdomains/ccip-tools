@@ -5,7 +5,7 @@ import { FC, useEffect, useMemo, useState } from "react";
 import { useAccount, useChainId, useSimulateContract, useSwitchChain, useWriteContract } from "wagmi";
 import { Address, formatEther } from "viem";
 import { useDeployedResolvers } from "../../../stores/deployed_resolvers";
-import { SORDeployments } from "../../../util/deployments";
+import { SORDeployments, isSOREnabled } from "../../../util/deployments";
 
 // https url that must include '{sender}'
 // const gatewayRegex = new RegExp("^https://.*{sender}.*$");
@@ -38,7 +38,10 @@ export const DeployResolverCard: FC = () => {
     const isGatewayUrlValid = gatewayRegex.test(gatewayUrl.trim());
     const isSignersValid = signersRegex.test(signers.trim());
 
-    const isReady = isGatewayUrlValid && isSignersValid;
+    const enabledOnChain = isSOREnabled(chainId);
+    const isReadyForChain = enabledOnChain === 'available';
+
+    const isReady = isGatewayUrlValid && isSignersValid && isReadyForChain;
 
     const factoryAddress = SORDeployments[chainId]?.[0]?.factory;
 
@@ -54,45 +57,7 @@ export const DeployResolverCard: FC = () => {
 
     const { chains, switchChain } = useSwitchChain();
 
-    const {writeContract} = useWriteContract();
-
-    // const { write, data } = useContractWrite(config);
-    // const receipt = useWaitForTransaction(data);
-
-    // const gas = useMemo(() => {
-    //     if (!EstimateData) return null;
-    //     if (!FeeData) return null;
-    //     if (!FeeData.gasPrice) return null;
-
-    //     const num = FeeData.gasPrice.mul(EstimateData.request.gasLimit);
-    //     const goerliOffset = chainId == 5 ? 1000n : 1n;
-
-    //     return {
-    //         // Is it me or is goerli fee data off by /1000
-    //         gasTotal: formatEther(num.toBigInt() / goerliOffset, 'gwei').substring(0, 8),
-    //     }
-    // }, [FeeData, EstimateData]);
-
-    // console.log({ receipt: receipt?.data });
-
-    // useEffect(() => {
-    //     if (!data) return;
-
-    //     logTransaction(data.hash, chainId.toString());
-    // }, [data]);
-
-    // useEffect(() => {
-    //     if (!receipt?.data) return;
-
-    //     const x = receipt.data;
-
-    //     const first = x.logs[0];
-    //     const address = first.address;
-
-    //     console.log('Contracted Deployed at: ' + address);
-
-    //     logTransactionSuccess(receipt.data.transactionHash, chainId.toString(), address);
-    // }, [receipt?.data]);
+    const { writeContract } = useWriteContract();
 
     return (
         <Card className="leading-6 gap-2">
@@ -111,6 +76,18 @@ export const DeployResolverCard: FC = () => {
                 options={chains.map((chain) => ({
                     value: chain.id.toString(),
                     label: chain.name,
+                    node: <div className="flex justify-between">
+                        <div>{chain.name}</div>
+                        <div>
+                            {(() => {
+                                switch (isSOREnabled(chain.id)) {
+                                    case 'available': return <span className="text-green-500">Available</span>;
+                                    case 'deprecated': return <span className="text-yellow-500">Deprecated</span>;
+                                    case 'unavailable': return <span className="text-red-500">Unavailable</span>;
+                                }
+                            })()}
+                        </div>
+                    </div>
                 }))}
                 onChange={(event) => {
                     switchChain({
@@ -203,9 +180,13 @@ export const DeployResolverCard: FC = () => {
                                 chainId,
                                 functionName: 'createOffchainResolver',
                                 args: [gatewayUrl, signersToArray(signers)],
+                            }, {
+                                onSuccess(data, variables, context) {
+                                    logTransaction(data, chainId.toString());;
+                                }
                             })
                         }}>
-                            { isLoading ? 'Estimating Fees...' : isSuccess ? 'Deploy ' + EstimateData?.request.gas + ' gas' : 'Deploy'}
+                            {isLoading ? 'Estimating Fees...' : isSuccess ? 'Deploy ' + EstimateData?.request.gas + ' gas' : 'Deploy'}
                         </Button>
                     );
                 })()
