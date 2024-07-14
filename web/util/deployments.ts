@@ -21,12 +21,6 @@ export const SORDeployments: Record<number, SORDeployment[]> = {
             version: '1',
         },
     ],
-    [goerli.id]: [
-        {
-            factory: '0x2F180aDBAAb3c57af31B7E96969999D4FB33faEE',
-            version: '1',
-        },
-    ],
     [sepolia.id]: [
         {
             factory: '0x0Fde82e81270431F2B956E7ce7E8860B2F61bcF9',
@@ -48,10 +42,6 @@ export const explorer_urls: Record<
     1: {
         transaction: 'https://etherscan.io/tx/:hash',
         address: 'https://etherscan.io/address/:address',
-    },
-    5: {
-        transaction: 'https://goerli.etherscan.io/tx/:hash',
-        address: 'https://goerli.etherscan.io/address/:address',
     },
     11_155_111: {
         transaction: 'https://sepolia.etherscan.io/tx/:hash',
