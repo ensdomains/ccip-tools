@@ -4,15 +4,14 @@ import { ConnectKitProvider } from 'connectkit';
 import { FC, ReactNode } from 'react';
 import { ThemeProvider } from 'styled-components';
 import { createConfig, http, WagmiProvider } from 'wagmi';
-import { goerli, holesky, mainnet, sepolia } from 'wagmi/chains';
+import { holesky, mainnet, sepolia } from 'wagmi/chains';
 
 import { ProfileButton } from '../components/molecules/ProfileButton';
 
 const client = createConfig({
-    chains: [goerli, mainnet, holesky, sepolia],
+    chains: [mainnet, holesky, sepolia],
     transports: {
         [mainnet.id]: http(),
-        [goerli.id]: http('https://eth-goerli.public.blastapi.io'),
         [holesky.id]: http(),
         [sepolia.id]: http(),
     },
