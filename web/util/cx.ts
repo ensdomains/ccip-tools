@@ -1,3 +1,3 @@
-export const cx = (...args: any[]) => {
-    return args.filter(Boolean).join(' ');
-}
+export const cx = (...arguments_: any[]) => {
+    return arguments_.filter(Boolean).join(' ');
+};

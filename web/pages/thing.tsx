@@ -3,13 +3,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConnectKitProvider } from 'connectkit';
 import { FC, ReactNode } from 'react';
 import { ThemeProvider } from 'styled-components';
-import { createConfig, WagmiProvider, http } from 'wagmi';
-import { sepolia, mainnet } from 'wagmi/chains';
+import { createConfig, http, WagmiProvider } from 'wagmi';
+import { holesky, mainnet, sepolia } from 'wagmi/chains';
+
+import { ProfileButton } from '../components/molecules/ProfileButton';
 
 const client = createConfig({
-    chains: [mainnet, sepolia],
+    chains: [mainnet, holesky, sepolia],
     transports: {
         [mainnet.id]: http(),
+        [holesky.id]: http(),
         [sepolia.id]: http(),
     },
 });
@@ -23,7 +26,10 @@ export const Thing: FC<{ children: ReactNode }> = ({ children }) => {
             <WagmiProvider config={client}>
                 <QueryClientProvider client={queryClient}>
                     <ConnectKitProvider>
-                        <div className="w-full max-w-lg mx-auto mt-12 px-4">
+                        <div className="flex justify-end p-2 md:absolute right-0 top-0 w-full md:w-fit">
+                            <ProfileButton />
+                        </div>
+                        <div className="w-full max-w-xl mx-auto mt-2 md:mt-12 px-4 mb-24">
                             {children}
                         </div>
                     </ConnectKitProvider>
