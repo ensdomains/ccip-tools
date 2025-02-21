@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { TransactionState, TransactionStateDeployed, TransactionStatePending, useDeployedResolvers } from "../../../stores/deployed_resolvers";
+import { TransactionState, TransactionStateDeployed, useDeployedResolvers } from "../../../stores/deployed_resolvers";
 import { useChainId, useContractRead, useTransaction } from "wagmi";
 import { Card, Input } from "@ensdomains/thorin";
 import { formatEther } from "viem";
@@ -60,8 +60,7 @@ export const DeployedResolver: FC<{ transaction: TransactionStateDeployed }> = (
     const { data: gateway_data } = useContractRead({
         address: transaction.contract_address as any,
         abi: [{ name: 'url', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ name: 'url', type: 'string' }] }],
-        functionName: 'url',
-        enabled: true,
+        functionName: 'url'
     });
     const { data: transactionData } = useTransaction({
         hash: transaction.hash as `0x${string}`,
@@ -104,8 +103,7 @@ export const DeployedResolver: FC<{ transaction: TransactionStateDeployed }> = (
                         </span>
                         <span className="items-center text-ens-light-red-bright">
                             {
-                                formatEther(
-                                    transactionData?.gasPrice?.mul(transactionData?.gasLimit).toBigInt() ?? BigInt(0))
+                                formatEther(BigInt(transactionData?.gasPrice || 0) * BigInt(transactionData?.gas || 0))
                             }
                         </span>
                     </div>

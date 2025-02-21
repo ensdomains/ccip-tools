@@ -1,25 +1,29 @@
 import { Button, Card, FlameSVG, GasPumpSVG, Input, OutlinkSVG, WalletSVG } from "@ensdomains/thorin";
-import { useChains, useModal } from "connectkit";
+import { useModal } from "connectkit";
 import { FactoryABI } from "../../../pages/abi/factory_abi";
 import { FC, useEffect, useMemo, useState } from "react";
-import { Address, useAccount, useChainId, useContractWrite, useFeeData, usePrepareContractWrite, useWaitForTransaction } from "wagmi";
-import { formatEther } from "viem";
+import { 
+  useAccount, 
+  useChainId,
+  useSimulateContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useFeeData
+} from "wagmi";
+import { formatEther, Address } from "viem";
 import { useDeployedResolvers } from "../../../stores/deployed_resolvers";
 
-// https url that must include '{sender}'
-// const gatewayRegex = new RegExp("^https://.*{sender}.*$");
+// Regular expressions remain the same
 const gatewayRegex = new RegExp("^https://.*$");
-// address[] that must include 0x and are seperated by ,
 const signersRegex = new RegExp("^\\[0x[0-9a-fA-F]{40}(,0x[0-9a-fA-F]{40})*\\]$");
 
 const signersToArray = (signers: string) => {
     if (!signersRegex.test(signers.trim())) return null;
     const n_signers = signers.trim().slice(1, -1).split(',');
-
     return n_signers;
 };
 
-const subdomainChainMap = {
+const subdomainChainMap: {[key: number]: string} = {
     1: '',
     5: 'goerli.',
     11155111: 'sepolia.'
@@ -49,60 +53,69 @@ export const DeployResolverCard: FC = () => {
 
     const isGatewayUrlValid = gatewayRegex.test(gatewayUrl.trim());
     const isSignersValid = signersRegex.test(signers.trim());
-
     const isReady = isGatewayUrlValid && isSignersValid;
 
     const factoryAddress = deployments[chainId]?.factory;
 
-    const { data: FeeData } = useFeeData({ chainId, formatUnits: chainId == 5 ? 'kwei' : 'gwei' });
+    const { data: feeData } = useFeeData({ 
+      chainId, 
+      formatUnits: 'gwei' 
+    });
 
-    const { transactions, logTransaction, logTransactionSuccess } = useDeployedResolvers();
+    const { logTransaction, logTransactionSuccess } = useDeployedResolvers();
 
-    const { config, data: EstimateData, error, isSuccess, isLoading } = usePrepareContractWrite({
+    // Replace usePrepareContractWrite with useSimulateContract
+    const { data: simulateData, error } = useSimulateContract({
         address: factoryAddress,
-        chainId,
+        abi: FactoryABI,
         functionName: 'createOffchainResolver',
         args: [gatewayUrl, signersToArray(signers)],
-        abi: FactoryABI,
-        enabled: isReady,
+        chainId
     });
-    const { write, data } = useContractWrite(config);
-    const receipt = useWaitForTransaction(data);
+
+    // Replace useContractWrite with useWriteContract
+    const { writeContract, data: hash } = useWriteContract();
+
+    // Replace useWaitForTransaction with useWaitForTransactionReceipt
+    const { data: receipt, isLoading: isConfirming } = useWaitForTransactionReceipt({
+        hash: hash,
+    });
 
     const gas = useMemo(() => {
-        if (!EstimateData) return null;
-        if (!FeeData) return null;
-        if (!FeeData.gasPrice) return null;
+        if (!simulateData || !feeData?.gasPrice) return null;
 
-        const num = FeeData.gasPrice.mul(EstimateData.request.gasLimit);
-        const goerliOffset = chainId == 5 ? 1000n : 1n;
+        const num = BigInt(simulateData.request.gas || 0) * feeData.gasPrice;
+        const goerliOffset = 1n;
 
         return {
-            // Is it me or is goerli fee data off by /1000
-            gasTotal: formatEther(num.toBigInt() / goerliOffset, 'gwei').substring(0, 8),
+            gasTotal: formatEther(num / goerliOffset).substring(0, 8),
         }
-    }, [FeeData, EstimateData]);
-
-    console.log({ receipt: receipt?.data });
+    }, [feeData, simulateData]);
 
     useEffect(() => {
-        if (!data) return;
-
-        logTransaction(data.hash, chainId.toString());
-    }, [data]);
+        if (!hash) return;
+        logTransaction(hash, chainId.toString());
+    }, [hash]);
 
     useEffect(() => {
-        if (!receipt?.data) return;
+        if (!receipt) return;
 
-        const x = receipt.data;
-
-        const first = x.logs[0];
+        const first = receipt.logs[0];
         const address = first.address;
 
-        console.log('Contracted Deployed at: ' + address);
+        console.log('Contract Deployed at: ' + address);
+        logTransactionSuccess(receipt.transactionHash, chainId.toString(), address);
+    }, [receipt]);
 
-        logTransactionSuccess(receipt.data.transactionHash, chainId.toString(), address);
-    }, [receipt?.data]);
+    const handleDeploy = async () => {
+        if (!simulateData?.request) return;
+        
+        try {
+            await writeContract(simulateData.request);
+        } catch (e) {
+            console.error('Failed to deploy contract:', e);
+        }
+    };
 
     return (
         <Card className="leading-6 gap-2">
@@ -117,82 +130,75 @@ export const DeployResolverCard: FC = () => {
             <Input
                 label="Gateway URL"
                 value={gatewayUrl}
-                onChange={
-                    (event) => {
-                        setGatewayUrl(event.target.value);
-                    }
-                }
-                error={gatewayUrl.trim() !== "" && !isGatewayUrlValid && 'Gateway URL must be a valid https url that includes "{sender}"'}
+                onChange={(event) => setGatewayUrl(event.target.value)}
+                error={gatewayUrl.trim() !== "" && !isGatewayUrlValid && 'Gateway URL must be a valid https url'}
                 placeholder="https://example.com/{sender}/{data}.json"
             />
             <Input
                 label="Signers (address[])"
                 value={signers}
-                onChange={
-                    (event) => {
-                        setSigners(event.target.value);
-                    }
-                }
-                error={signers.trim() !== "" && !isSignersValid && 'Signers must be a valid array of addresses seperated by ,'}
+                onChange={(event) => setSigners(event.target.value)}
+                error={signers.trim() !== "" && !isSignersValid && 'Signers must be a valid array of addresses separated by ,'}
                 placeholder="[0x225f137127d9067788314bc7fcc1f36746a3c3B5]"
             />
 
-            {
-                !isConnected && (
-                    <Button onClick={() => { setOpen(true) }}>
-                        Connect Wallet
-                    </Button>
-                )
-            }
-            {
-                error && (
-                    <p className="text-red-500">
-                        {!Object.keys(subdomainChainMap).includes(
-                            chainId.toString()
-                        )
-                            ? `This network is not supported, supported networks: [${Object.values(
-                                  subdomainChainMap
-                              )
-                                  .map((val) => (val === '' ? 'mainnet' : val))
-                                  .join(', ')}]`
-                            : error.message}
-                    </p>
-                )
-            }
-            {
-                EstimateData && (
-                    <div className="flex justify-around items-center">
-                        <div className="flex gap-2 items-center">
-                            <GasPumpSVG />
-                            {FeeData?.formatted?.gasPrice}
-                        </div>
-                        <div className="flex gap-2 items-center">
-                            <FlameSVG />
-                            {Number(EstimateData.request.gasLimit).toLocaleString()}
-                        </div>
-                        <div className="flex gap-2 items-center">
-                            <WalletSVG /> {gas?.gasTotal}
-                        </div>
+            {!isConnected && (
+                <Button onClick={() => setOpen(true)}>
+                    Connect Wallet
+                </Button>
+            )}
+            
+            {error && (
+                <p className="text-red-500">
+                    {!Object.keys(subdomainChainMap).includes(chainId.toString())
+                        ? `This network is not supported, supported networks: [${Object.values(subdomainChainMap)
+                            .map((val) => (val === '' ? 'mainnet' : val))
+                            .join(', ')}]`
+                        : error.message}
+                </p>
+            )}
+
+            {simulateData && (
+                <div className="flex justify-around items-center">
+                    <div className="flex gap-2 items-center">
+                        <GasPumpSVG />
+                        {feeData?.formatted?.gasPrice}
                     </div>
-                )
-            }
-            {
-                (() => {
-                    if (!isConnected) return null;
+                    <div className="flex gap-2 items-center">
+                        <FlameSVG />
+                        {Number(simulateData.request.gas).toLocaleString()}
+                    </div>
+                    <div className="flex gap-2 items-center">
+                        <WalletSVG /> {gas?.gasTotal}
+                    </div>
+                </div>
+            )}
 
-                    if (receipt.isSuccess) return (
-                        <Button colorStyle="greenPrimary" suffix={<OutlinkSVG />} as="a" target="_blank" href={
-                            `https://${subdomainChainMap[chainId] || ''}etherscan.io/tx/${receipt.data?.transactionHash}#internal`
-                        }>View on Etherscan</Button>
-                    );
+            {(() => {
+                if (!isConnected) return null;
 
-                    return (
-                        <Button disabled={!isReady || !write || receipt.isLoading} loading={receipt.isLoading} onClick={() => write?.()}>
-                            {receipt.isLoading ? "Processing" : isLoading ? 'Estimating Fees...' : isSuccess ? 'Deploy ' + EstimateData?.request.gasLimit + ' gas' : 'Deploy'}
-                        </Button>
-                    );
-                })()
-            }
+                if (receipt) return (
+                    <Button 
+                        colorStyle="greenPrimary" 
+                        suffix={<OutlinkSVG />} 
+                        as="a" 
+                        target="_blank" 
+                        href={`https://${subdomainChainMap[chainId] || ''}etherscan.io/tx/${receipt.transactionHash}#internal`}
+                    >
+                        View on Etherscan
+                    </Button>
+                );
+
+                return (
+                    <Button 
+                        disabled={!isReady || !simulateData || isConfirming} 
+                        loading={isConfirming} 
+                        onClick={handleDeploy}
+                    >
+                        {isConfirming ? "Processing" : !simulateData ? 'Estimating Fees...' : `Deploy ${simulateData.request.gas} gas`}
+                    </Button>
+                );
+            })()}
         </Card>
-    )
-};
+    );
+}
