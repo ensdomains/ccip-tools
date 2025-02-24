@@ -9,15 +9,18 @@ import {
     WalletSVG,
 } from '@ensdomains/thorin';
 import { useModal } from 'connectkit';
-import { FactoryABI } from '../../../pages/abi/factory_abi';
-import { FC,useState } from 'react';
+import { FC, useState } from 'react';
 import {
     useAccount,
     useChainId,
-    useSimulateContract,
+    useEstimateGas,
+    useGasPrice,
     useSwitchChain,
     useWriteContract,
 } from 'wagmi';
+import { encodeFunctionData, formatEther } from 'viem/utils';
+
+import { FactoryABI } from '../../../pages/abi/factory_abi';
 import { useDeployedResolvers } from '../../../stores/deployed_resolvers';
 import { SORDeployments, isSOREnabled } from '../../../util/deployments';
 
@@ -62,19 +65,29 @@ export const DeployResolverCard: FC = () => {
 
     const {
         data: EstimateData,
-        error,
-        isSuccess,
-        isLoading,
-    } = useSimulateContract(
+        error: errorGas,
+        isSuccess: isSuccessGas,
+        isLoading: isLoadingGas,
+    } = useEstimateGas(
         isReady
             ? {
-                  address: factoryAddress,
-                  abi: FactoryABI,
-                  functionName: 'createOffchainResolver',
-                  args: [gatewayUrl, signersToArray(signers)],
+                  data: encodeFunctionData({
+                      abi: FactoryABI,
+                      functionName: 'createOffchainResolver',
+                      args: [gatewayUrl, signersToArray(signers)],
+                  }),
+                  to: factoryAddress,
               }
             : undefined
     );
+
+    const {
+        data: gasPrice,
+        isLoading: isLoadingGasPrice,
+        isSuccess: isSuccessGasPrice,
+    } = useGasPrice({
+        chainId,
+    });
 
     const { chains, switchChain } = useSwitchChain();
 
@@ -172,7 +185,7 @@ export const DeployResolverCard: FC = () => {
                     Connect Wallet
                 </Button>
             )}
-            {error && (
+            {errorGas && (
                 <p className="text-red-500">
                     {!Object.keys(subdomainChainMap).includes(
                         chainId.toString()
@@ -182,24 +195,24 @@ export const DeployResolverCard: FC = () => {
                           )
                               .map((val) => (val === '' ? 'mainnet' : val))
                               .join(', ')}]`
-                        : error.message}
+                        : errorGas.message}
                 </p>
             )}
-            {EstimateData && (
+            {isSuccessGas && isSuccessGasPrice ? (
                 <div className="flex justify-around items-center">
                     <div className="flex gap-2 items-center">
                         <GasPumpSVG />
-                        {EstimateData.request.gasPrice?.toString()}
+                        {formatEther(EstimateData * gasPrice)}
                     </div>
                     <div className="flex gap-2 items-center">
                         <FlameSVG />
-                        {Number(EstimateData.request.gas).toLocaleString()}
+                        {Number(EstimateData).toLocaleString()}
                     </div>
                     <div className="flex gap-2 items-center">
                         <WalletSVG />
                     </div>
                 </div>
-            )}
+            ) : undefined}
 
             <Banner alert="warning" title="Under Construction">
                 This section of the site is undergoing maintenance to support
@@ -227,7 +240,7 @@ export const DeployResolverCard: FC = () => {
                                     args: [gatewayUrl, signersToArray(signers)],
                                 },
                                 {
-                                    onSuccess(data, variables, context) {
+                                    onSuccess(data) {
                                         logTransaction(
                                             data,
                                             chainId.toString()
@@ -237,10 +250,10 @@ export const DeployResolverCard: FC = () => {
                             );
                         }}
                     >
-                        {isLoading
+                        {(isLoadingGas || isLoadingGasPrice)
                             ? 'Estimating Fees...'
-                            : isSuccess
-                            ? 'Deploy ' + EstimateData?.request.gas + ' gas'
+                            : isSuccessGas
+                            ? 'Deploy ' + EstimateData + ' gas'
                             : 'Deploy'}
                     </Button>
                 );
