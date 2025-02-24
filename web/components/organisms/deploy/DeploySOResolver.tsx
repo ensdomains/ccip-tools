@@ -9,7 +9,7 @@ import {
     WalletSVG,
 } from '@ensdomains/thorin';
 import { useModal } from 'connectkit';
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import {
     useAccount,
     useChainId,
@@ -64,7 +64,7 @@ export const DeployResolverCard: FC = () => {
     const { logTransaction } = useDeployedResolvers();
 
     const {
-        data: EstimateData,
+        data: estimatedGas,
         error: errorGas,
         isSuccess: isSuccessGas,
         isLoading: isLoadingGas,
@@ -92,6 +92,12 @@ export const DeployResolverCard: FC = () => {
     const { chains, switchChain } = useSwitchChain();
 
     const { writeContract } = useWriteContract();
+
+    const gasFee = useMemo(() => {
+        if (!estimatedGas || !gasPrice) return null
+        return estimatedGas * gasPrice
+      }, [estimatedGas, gasPrice])
+    
 
     return (
         <Card className="leading-6 gap-2">
@@ -198,15 +204,15 @@ export const DeployResolverCard: FC = () => {
                         : errorGas.message}
                 </p>
             )}
-            {isSuccessGas && isSuccessGasPrice ? (
+            {gasFee ? (
                 <div className="flex justify-around items-center">
                     <div className="flex gap-2 items-center">
                         <GasPumpSVG />
-                        {formatEther(EstimateData * gasPrice)}
+                        {formatEther(gasFee)}
                     </div>
                     <div className="flex gap-2 items-center">
                         <FlameSVG />
-                        {Number(EstimateData).toLocaleString()}
+                        {Number(estimatedGas).toLocaleString()}
                     </div>
                     <div className="flex gap-2 items-center">
                         <WalletSVG />
@@ -253,7 +259,7 @@ export const DeployResolverCard: FC = () => {
                         {(isLoadingGas || isLoadingGasPrice)
                             ? 'Estimating Fees...'
                             : isSuccessGas
-                            ? 'Deploy ' + EstimateData + ' gas'
+                            ? 'Deploy ' + estimatedGas + ' gas'
                             : 'Deploy'}
                     </Button>
                 );
