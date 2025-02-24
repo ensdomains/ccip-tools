@@ -2,17 +2,15 @@ import {
     Banner,
     Button,
     Card,
-    FieldSet,
     FlameSVG,
     GasPumpSVG,
     Input,
-    OutlinkSVG,
     Select,
     WalletSVG,
 } from '@ensdomains/thorin';
-import { useChains, useModal } from 'connectkit';
+import { useModal } from 'connectkit';
 import { FactoryABI } from '../../../pages/abi/factory_abi';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC,useState } from 'react';
 import {
     useAccount,
     useChainId,
@@ -20,7 +18,6 @@ import {
     useSwitchChain,
     useWriteContract,
 } from 'wagmi';
-import { Address, formatEther } from 'viem';
 import { useDeployedResolvers } from '../../../stores/deployed_resolvers';
 import { SORDeployments, isSOREnabled } from '../../../util/deployments';
 
@@ -38,7 +35,7 @@ const signersToArray = (signers: string) => {
 
 const subdomainChainMap: { [key: number]: string } = {
     1: '',
-    5: 'goerli.',
+    17000: 'holesky.',
     11155111: 'sepolia.',
 };
 
@@ -61,7 +58,7 @@ export const DeployResolverCard: FC = () => {
 
     const factoryAddress = SORDeployments[chainId]?.[0]?.factory;
 
-    const { logTransaction, logTransactionSuccess } = useDeployedResolvers();
+    const { logTransaction } = useDeployedResolvers();
 
     const {
         data: EstimateData,
