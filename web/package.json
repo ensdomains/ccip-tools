@@ -19,7 +19,7 @@
         "@vitejs/plugin-react": "^3.1.0",
         "autoprefixer": "^10.4.19",
         "buffer": "^6.0.3",
-        "connectkit": "^1.7.3",
+        "connectkit": "^1.8.2",
         "encoding": "^0.1.13",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-react": "^7.34.1",
@@ -33,13 +33,13 @@
         "react-hook-form": "^7.51.3",
         "react-icons": "^4.12.0",
         "react-modal": "^3.16.1",
-        "styled-components": "^5.3.11",
+        "styled-components": "^6.1.15",
         "tailwindcss": "^3.4.3",
-        "viem": "^2.9.29",
+        "viem": "^2.23.4",
         "vite": "^4.5.3",
         "vite-plugin-rewrite-all": "^1.0.2",
         "vite-tsconfig-paths": "^4.3.2",
-        "wagmi": "^2.7.1",
+        "wagmi": "^2.14.11",
         "zustand": "^4.5.2"
     },
     "devDependencies": {
@@ -49,6 +49,6 @@
         "@typescript-eslint/parser": "^5.62.0",
         "eslint": "^8.57.0",
         "eslint-plugin-v3xlabs": "^1.6.5",
-        "typescript": "5.0.3"
+        "typescript": "5.7.3"
     }
 }

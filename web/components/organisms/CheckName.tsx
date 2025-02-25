@@ -1,21 +1,23 @@
-import { Button, Card, Input } from '@ensdomains/thorin';
+import { Card, Input, Button } from '@ensdomains/thorin';
+import { namehash } from 'viem/ens';
 import { FC, useReducer } from 'react';
 import { useForm } from 'react-hook-form';
-import { useProvider } from 'wagmi';
+import { ENS_Resolver_ABI } from '../../pages/abi/resolver_abi.js';
+import { useEnsResolver, usePublicClient } from 'wagmi';
 
 type FormValues = {
     name: string;
 };
 
 export const CheckName: FC = () => {
-    const { register, formState, handleSubmit } = useForm<FormValues>({
+    const { register, handleSubmit } = useForm<FormValues>({
         mode: 'onChange',
         defaultValues: {
             name: 'vitalik.eth',
         },
     });
 
-    const provider = useProvider();
+    const publicClient = usePublicClient();
 
     const [loading, setLoading] = useReducer(
         (loading: number, action: 'incr' | 'decr') => {
@@ -25,15 +27,33 @@ export const CheckName: FC = () => {
     );
 
     const onSubmit = handleSubmit(async ({ name }) => {
-        setLoading('incr');
-        const resolver = await provider.getResolver(name);
+        try {
+            setLoading('incr');
 
-        alert(resolver?.address);
+            // Get resolver using wagmi's useEnsResolver hook
+            const { data: resolver } = useEnsResolver({
+                name,
+            });
 
-        const data = await resolver?.getAvatar();
+            if (resolver) {
+                alert(resolver);
 
-        alert(JSON.stringify(data));
-        setLoading('decr');
+                // Read avatar using the resolver contract
+                const data = await publicClient?.readContract({
+                    address: resolver,
+                    abi: ENS_Resolver_ABI,
+                    functionName: 'avatar',
+                    args: [namehash(name)],
+                });
+
+                alert(JSON.stringify(data));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error fetching ENS data');
+        } finally {
+            setLoading('decr');
+        }
     });
 
     return (
