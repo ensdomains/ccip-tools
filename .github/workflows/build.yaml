@@ -36,9 +36,9 @@ jobs:
       - name: Build
         run: cd web && pnpm build
       - name: Edgeserver Upload
-        uses: lvkdotsh/edgeserver-action@master
+        uses: lvkdotsh/edgeserver-action@16dcc1a1ec40853234f480dbf798e6e1dab0fc6a
         with:
-          site_id: "166220412340932608"
+          app_id: "166220412340932608"
           server: https://api.edgeserver.io
           token: ${{ secrets.EDGESERVER_TOKEN }}
           directory: web/dist
