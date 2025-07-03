@@ -11,9 +11,9 @@ import { ProfileButton } from '../components/molecules/ProfileButton';
 const client = createConfig({
     chains: [mainnet, holesky, sepolia],
     transports: {
-        [mainnet.id]: http(),
-        [holesky.id]: http(),
-        [sepolia.id]: http(),
+        [mainnet.id]: http('https://ethereum-rpc.publicnode.com'),
+        [holesky.id]: http('https://ethereum-holesky-rpc.publicnode.com'),
+        [sepolia.id]: http('https://ethereum-sepolia-rpc.publicnode.com'),
     },
 });
 
