@@ -10,7 +10,7 @@ export const App = () => {
                 <div className="w-full flex justify-between items-center">
                     <div>
                         <h1 className="block text-xl font-extrabold bg-gradient-to-tr from-ens-blue to bg-ens-teal bg-clip-text text-transparent">
-                            CCIP.Tools
+                            CCIP Tools
                         </h1>
                         <p className="text-sm leading-none text-ens-grey2">
                             Because Offchain Resolution
