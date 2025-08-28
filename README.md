@@ -1,1 +1,1 @@
-[![](./.github/banner.png)](https://ccip.tools)
+Simple interface for deploying offchain resolvers for ENS names.
